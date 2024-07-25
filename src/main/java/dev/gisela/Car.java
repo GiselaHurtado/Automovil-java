@@ -14,8 +14,10 @@ public class Car {
     enum Color {WHITE, PEARL, RED, BLUE, PINK, BLACK, GREY}
     Color color;
     int currentSpeed = 0;
+    Double penalty = 0.0;
+    Boolean isAutomatic;
 
-    Car(String brand, int model, int engineLitres, FuelType fuelType, CarType carType, int numberOfDoors, int numberOfSeats, int maxSpeed, Color color) {
+    Car(String brand, int model, int engineLitres, FuelType fuelType, CarType carType, int numberOfDoors, int numberOfSeats, int maxSpeed, Color color, Double penalty, Boolean isAutomatic) {
         this.brand = brand;
         this.model = model;
         this.engineLitres = engineLitres;
@@ -25,6 +27,16 @@ public class Car {
         this.numberOfSeats = numberOfSeats;
         this.maxSpeed = maxSpeed;
         this.color = color;
+        this.penalty = penalty;
+        this.isAutomatic = isAutomatic;
+    }
+
+    public Double getPenalty() {
+        return penalty;
+    }
+
+    public void setPenalty(Double penalty) {
+        this.penalty = penalty;
     }
 
     public String getBrand() {
@@ -107,22 +119,31 @@ public class Car {
         this.currentSpeed = currentSpeed;
     }
 
+    public Boolean getIsAutomatic() {
+        return isAutomatic;
+    }
+
+    public void setIsAutomatic(Boolean isAutomatic) {
+        this.isAutomatic = isAutomatic;
+    }
+
     void accelerate(int speedIncrement) {
-        if (currentSpeed + speedIncrement < maxSpeed) {
-     
-            currentSpeed = currentSpeed + speedIncrement;
-        } else { 
-           
-            System.out.println("Cannot increase to a speed higher than the car's maximum speed.");
+        if (currentSpeed + speedIncrement <= maxSpeed) {
+            currentSpeed += speedIncrement;
+            if (currentSpeed > 120) {
+                penalty += 50;
+                System.out.println("Speed exceeds 120 km/h. Penalty applied. Actual penalty: " + penalty);
+            }
+        } else {
+            penalty += 50;
+            System.out.println("Cannot increase to a speed higher than the car's maximum speed. Actual penalty: " + penalty);
         }
     }
 
     void decelerate(int speedDecrement) {
-       
         if ((currentSpeed - speedDecrement) > 0) {
-            currentSpeed = currentSpeed - speedDecrement;
-        } else { 
-          
+            currentSpeed -= speedDecrement;
+        } else {
             System.out.println("Cannot decrease to a negative speed.");
         }
     }
@@ -131,12 +152,18 @@ public class Car {
         currentSpeed = 0;
     }
 
-    
     double calculateArrivalTime(int distance) {
         return (double) distance / currentSpeed;
     }
 
-    
+    public boolean hasPenalties() {
+        return penalty > 0;
+    }
+
+    public double valueTotalPenalties() {
+        return penalty;
+    }
+
     void print() {
         System.out.println("Brand = " + brand);
         System.out.println("Model = " + model);
@@ -147,21 +174,21 @@ public class Car {
         System.out.println("Number of Seats = " + numberOfSeats);
         System.out.println("Max Speed = " + maxSpeed);
         System.out.println("Color = " + color);
+        System.out.println("Automatic = " + (isAutomatic ? "Yes" : "No"));
     }
 
-
     public static void main(String[] args) {
-        Car car1 = new Car("Tesla", 2024, 3, FuelType.ELECTRIC, CarType.EXECUTIVE, 5, 6, 250, Color.BLACK);
+        Car car1 = new Car("Tesla", 2024, 3, FuelType.ELECTRIC, CarType.EXECUTIVE, 5, 6, 250, Color.BLACK, 0.0, true);
         car1.print();
-        car1.setCurrentSpeed(110);
+        car1.setCurrentSpeed(150);
         System.out.println("Current Speed = " + car1.getCurrentSpeed());
         car1.accelerate(20);
         System.out.println("Current Speed = " + car1.getCurrentSpeed());
-        car1.decelerate(40);
+        car1.decelerate(0);
         System.out.println("Current Speed = " + car1.getCurrentSpeed());
         car1.brake();
         System.out.println("Current Speed = " + car1.getCurrentSpeed());
-        car1.decelerate(20);
+        car1.decelerate(0);
+        System.out.println("Actual Penalty = " + car1.getPenalty());
     }
-    
 }
